@@ -24,12 +24,7 @@ import org.eclipse.lsp4j.InitializeParams;
  */
 public class SchematronPlugin implements IXMLExtension {
 
-	private final IDiagnosticsParticipant diagnosticsParticipant;
-
-	public SchematronPlugin() {
-		diagnosticsParticipant = new SchematronDiagnosticsParticipant();
-		System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
-	}
+	private IDiagnosticsParticipant diagnosticsParticipant;
 
 	@Override
 	public void doSave(ISaveContext context) {
@@ -38,6 +33,9 @@ public class SchematronPlugin implements IXMLExtension {
 
 	@Override
 	public void start(InitializeParams params, XMLExtensionsRegistry registry) {
+		System.setProperty("javax.xml.transform.TransformerFactory",
+				"org.apache.xalan.processor.TransformerFactoryImpl");
+		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
 	}
 

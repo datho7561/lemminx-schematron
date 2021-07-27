@@ -18,6 +18,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <junit.version>5.7.1</junit.version>
+    <lemminx.version>0.17.1</lemminx.version>
   </properties>
 
   <repositories>
@@ -37,7 +38,7 @@
     <dependency>
       <groupId>org.eclipse.lemminx</groupId>
       <artifactId>org.eclipse.lemminx</artifactId>
-      <version>0.17.1</version>
+      <version>${lemminx.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -68,6 +69,14 @@
       <artifactId>junit-jupiter-params</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.lemminx</groupId>
+      <artifactId>org.eclipse.lemminx</artifactId>
+      <version>${lemminx.version}</version>
+      <scope>test</scope>
+      <classifier>tests</classifier>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 

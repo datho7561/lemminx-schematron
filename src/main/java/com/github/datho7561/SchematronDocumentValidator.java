@@ -1,8 +1,17 @@
+/*******************************************************************************
+* Copyright (c) 2021 Red Hat Inc. and others.
+* All rights reserved. This program and the accompanying materials
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v20.html
+*
+* Contributors:
+*     Red Hat Inc. - initial API and implementation
+*******************************************************************************/
 package com.github.datho7561;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +42,11 @@ import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
 
+/**
+ * Validates an XML document using Schematron schemas
+ *
+ * @author datho7561
+ */
 public class SchematronDocumentValidator {
 
 	private static final Range ZERO_RANGE = new Range(new Position(0, 0), new Position(0, 1));
@@ -46,39 +60,48 @@ public class SchematronDocumentValidator {
 
 	Logger LOGGER = Logger.getLogger(SchematronDocumentValidator.class.getName());
 
+	/**
+	 * Returns a list of diagnostics for an XML document given the Schematron
+	 * schemas that it references
+	 *
+	 * @param xmlDocument   the XML document to validate
+	 * @param schemaFiles   the list of Schematron schema files to validate the
+	 *                      document against
+	 * @param cancelChecker the cancel checker
+	 * @return a list of diagnostics for the XML document
+	 */
 	public List<Diagnostic> validate(DOMDocument xmlDocument, List<File> schemaFiles, CancelChecker cancelChecker) {
 		List<Diagnostic> diagnostics = new ArrayList<>();
-		try {
-			URI xmlDocumentURI = new URI(xmlDocument.getDocumentURI());
-			File xmlDocumentFile = new File(xmlDocumentURI);
-			for (File schema : schemaFiles) {
-				Schematron schematron = null;
-				try {
-					schematron = new Schematron(new StreamSource(schema));
-				} catch (RuntimeException e) {
-					diagnostics.add(getDiagnosticFromInvalidSchematron(schema.getAbsolutePath()));
-				}
-				if (schematron != null) {
-					try {
-						Result validationResult = schematron.validate(new StreamSource(xmlDocumentFile));
-						if (!validationResult.isValid()) {
-							for (String message : validationResult.getValidationMessages()) {
-								diagnostics.add(getSchematronMessageAsDiagnostic(message, xmlDocument, xmlDocumentFile));
-							}
-						}
-					} catch (SchematronException e) {
-						diagnostics.add(getDiagnosticFromInvalidSchematron(schema.getAbsolutePath()));
-					}
-				}
-				cancelChecker.checkCanceled();
+		for (File schema : schemaFiles) {
+			Schematron schematron = null;
+			try {
+				schematron = new Schematron(new StreamSource(schema));
+			} catch (RuntimeException e) {
+				// FIXME: Use the path to the schema
+				String schemaPath = schema.getName();
+				diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
 			}
-		} catch (URISyntaxException uriException) {
-			LOGGER.log(Level.SEVERE, "Unable to turn document URI into a URI", uriException);
+			if (schematron != null) {
+				try {
+					Result validationResult = schematron.validate(new StreamSource(
+							new ByteArrayInputStream(xmlDocument.getText().getBytes(StandardCharsets.UTF_8))));
+					if (!validationResult.isValid()) {
+						for (String message : validationResult.getValidationMessages()) {
+							diagnostics.add(getSchematronMessageAsDiagnostic(message, xmlDocument));
+						}
+					}
+				} catch (SchematronException e) {
+					// FIXME: Use the path to the schema
+					String schemaPath = schema.getName();
+					diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
+				}
+			}
+			cancelChecker.checkCanceled();
 		}
 		return diagnostics;
 	}
 
-	private Diagnostic getSchematronMessageAsDiagnostic(String message, DOMDocument xmlDocument, File xmlDocumentFile) {
+	private Diagnostic getSchematronMessageAsDiagnostic(String message, DOMDocument xmlDocument) {
 		Diagnostic d = new Diagnostic(ZERO_RANGE, message);
 		d.setCode("failed-assert");
 
@@ -127,6 +150,7 @@ public class SchematronDocumentValidator {
 	}
 
 	private static Diagnostic getDiagnosticFromInvalidSchematron(String schemaPath) {
+		// FIXME: place the error on the xml-model
 		Diagnostic d = new Diagnostic(ZERO_RANGE, "Schema " + schemaPath + " is invalid");
 		d.setCode("bad-schematron");
 		return d;
