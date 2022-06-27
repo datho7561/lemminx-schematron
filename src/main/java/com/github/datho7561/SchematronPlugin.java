@@ -33,8 +33,6 @@ public class SchematronPlugin implements IXMLExtension {
 
 	@Override
 	public void start(InitializeParams params, XMLExtensionsRegistry registry) {
-		System.setProperty("javax.xml.transform.TransformerFactory",
-				"org.apache.xalan.processor.TransformerFactoryImpl");
 		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
 	}
