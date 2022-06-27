@@ -18,7 +18,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <junit.version>5.7.1</junit.version>
-    <lemminx.version>0.17.1</lemminx.version>
+    <lemminx.version>0.20.0</lemminx.version>
   </properties>
 
   <repositories>
@@ -44,12 +44,18 @@
     <dependency>
       <groupId>name.dmaus.schxslt</groupId>
       <artifactId>java</artifactId>
-      <version>2.0.4</version>
+      <version>3.1.1</version>
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
       <version>2.7.2</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.12.2</version>
+      <scope>provided</scope>
     </dependency>
     <!-- Test -->
     <dependency>
@@ -112,6 +118,9 @@
               <excludes>
                 <exclude>META-INF/MANIFEST.MF</exclude>
                 <exclude>META-INF/DEPENDENCIES</exclude>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
               </excludes>
             </filter>
           </filters>

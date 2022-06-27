@@ -58,7 +58,7 @@ public class SchematronDocumentValidator {
 
 	private final XPathFactory xpathFactory = XPathFactory.newInstance();
 
-	Logger LOGGER = Logger.getLogger(SchematronDocumentValidator.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SchematronDocumentValidator.class.getName());
 
 	/**
 	 * Returns a list of diagnostics for an XML document given the Schematron
@@ -76,8 +76,9 @@ public class SchematronDocumentValidator {
 			Schematron schematron = null;
 			try {
 				schematron = new Schematron(new StreamSource(schema));
-			} catch (RuntimeException e) {
+			} catch (RuntimeException | SchematronException e) {
 				// FIXME: Use the path to the schema
+				LOGGER.log(Level.WARNING, "Error while processing the schema", e);
 				String schemaPath = schema.getName();
 				diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
 			}
@@ -94,6 +95,10 @@ public class SchematronDocumentValidator {
 					// FIXME: Use the path to the schema
 					String schemaPath = schema.getName();
 					diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
+				} catch (NullPointerException npe) {
+					// FIXME: Use the path to the schema
+					String schemaPath = schema.getName();
+					diagnostics.add(getDiagnosticFromSchematronThatBreaksSchxslt(schemaPath));
 				}
 			}
 			cancelChecker.checkCanceled();
@@ -153,6 +158,13 @@ public class SchematronDocumentValidator {
 		// FIXME: place the error on the xml-model
 		Diagnostic d = new Diagnostic(ZERO_RANGE, "Schema " + schemaPath + " is invalid");
 		d.setCode("bad-schematron");
+		return d;
+	}
+
+	private static Diagnostic getDiagnosticFromSchematronThatBreaksSchxslt(String schemaPath) {
+		// FIXME: place the error on the xml-model
+		Diagnostic d = new Diagnostic(ZERO_RANGE, "The schema parser encountered an error while trying to parse " + schemaPath);
+		d.setCode("schematron-parser-error");
 		return d;
 	}
 

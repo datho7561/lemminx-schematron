@@ -47,4 +47,18 @@ public class SchematronDiagnosticsParticipantTest {
 				d(r(0, 0, 0, 1), "Schema invalid.sch is invalid", "bad-schematron"));
 	}
 
+	// FIXME: debug schxslt and xalan to figure out why this happens
+	@Test
+	public void testValidationSchematronThatBreaksSchxslt() {
+		String xml = "<?xml-model href=\"src/test/resources/schematron/breaks-schxslt.sch\" type=\"application/xml\" schematypens=\"http://www.ascc.net/xml/schematron\"?>\n"
+				+ //
+				"<Person Title=\"Mr\">\n" + //
+				"  <Name>Eddie</Name>\n" + //
+				"  <Gender>Female</Gender>\n" + //
+				"</Person>";
+		// FIXME:
+		XMLAssert.testDiagnosticsFor(xml,
+				d(r(0, 0, 0, 1), "The schema parser encountered an error while trying to parse breaks-schxslt.sch", "schematron-parser-error"));
+	}
+
 }

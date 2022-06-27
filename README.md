@@ -25,4 +25,5 @@ It uses [schxslt](https://github.com/schxslt/schxslt) and [xalan](https://xalan.
 
 * You can only validate with local `.sch` files
 * Not tested thoroughly
+* Some valid `.sch` files can't be validated, probably related to https://github.com/schxslt/schxslt/issues/97
 * The `.jar` is 5 MB, which may be prohibitively large to include as a part of the standard LemMinX distribution
