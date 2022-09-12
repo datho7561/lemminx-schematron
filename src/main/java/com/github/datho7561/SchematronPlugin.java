@@ -9,6 +9,7 @@
 *******************************************************************************/
 package com.github.datho7561;
 
+import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelProvider;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
@@ -25,6 +26,7 @@ import org.eclipse.lsp4j.InitializeParams;
 public class SchematronPlugin implements IXMLExtension {
 
 	private IDiagnosticsParticipant diagnosticsParticipant;
+	private ContentModelManagerManager contentModelManagerManager;
 
 	@Override
 	public void doSave(ISaveContext context) {
@@ -35,6 +37,12 @@ public class SchematronPlugin implements IXMLExtension {
 	public void start(InitializeParams params, XMLExtensionsRegistry registry) {
 		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
+
+		ContentModelProvider modelProvider = new SchematronModelProvider();
+		contentModelManagerManager = new ContentModelManagerManager(registry);
+		contentModelManagerManager.registerContentModelListener((cm) -> {
+			cm.registerModelProvider(modelProvider);
+		});
 	}
 
 	@Override

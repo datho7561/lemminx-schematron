@@ -10,12 +10,15 @@
 package com.github.datho7561;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.lemminx.dom.DOMDocument;
@@ -24,6 +27,7 @@ import org.eclipse.lemminx.extensions.contentmodel.model.ReferencedGrammarInfo;
 import org.eclipse.lemminx.extensions.contentmodel.settings.XMLValidationSettings;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
+import org.eclipse.lemminx.uriresolver.CacheResourcesManager;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 
@@ -35,7 +39,7 @@ import org.eclipse.lsp4j.jsonrpc.CancelChecker;
  */
 public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant {
 
-	private final Logger LOGGER = Logger.getLogger(SchematronDiagnosticsParticipant.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SchematronDiagnosticsParticipant.class.getName());
 
 	private SchematronDocumentValidator validator = new SchematronDocumentValidator();
 	private ContentModelManagerManager contentModelManagerManager;
@@ -75,19 +79,48 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 		for (ReferencedGrammarInfo grammar : grammars) {
 			if (grammar != null && grammar.getIdentifier() != null
 					&& "xml-model".equals(grammar.getIdentifier().getKind())) {
+				URI uri = null;
 				try {
-					File schematronFile = new File(new URI(grammar.getResolvedURIInfo().getResolvedURI()));
-					if (schematronFile.exists()) {
-						schematronFiles.add(schematronFile);
-					}
+					uri = new URI(grammar.getResolvedURIInfo().getResolvedURI());
 				} catch (URISyntaxException e) {
 					LOGGER.warning("Encountered invalid grammar file URI: \""
 							+ grammar.getResolvedURIInfo().getResolvedURI() + "\"");
+				}
+				if (uri != null) {
+					switch (uri.getScheme()) {
+						case "file":
+							collectLocalSchematron(uri, schematronFiles);
+							break;
+						case "http":
+						case "https":
+						case "ftp":
+							collectRemoteSchematron(uri, schematronFiles, contentModelManager);
+							break;
+					}
 				}
 			}
 		}
 
 		return schematronFiles.size() > 0 ? schematronFiles : null;
+	}
+
+	private static void collectLocalSchematron(URI uri, List<File> schematronFiles) {
+		File file = new File(uri);
+		if (file.exists()) {
+			schematronFiles.add(file);
+		}
+	}
+
+	private static void collectRemoteSchematron(URI uri, List<File> schematronFiles, ContentModelManager contentModelManager) {
+		try {
+			Path cachedFilePath = CacheResourcesManager.getResourceCachePath(uri.toString());
+			File file = cachedFilePath.toFile();
+			if (file.exists()) {
+				schematronFiles.add(file);
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Error while collecting Schematron `" + uri + "`: ", e);
+		}
 	}
 
 }

@@ -9,6 +9,10 @@
 *******************************************************************************/
 package com.github.datho7561;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.eclipse.lemminx.extensions.contentmodel.ContentModelPlugin;
 import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelManager;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
@@ -23,9 +27,11 @@ public class ContentModelManagerManager {
 
 	private final XMLExtensionsRegistry registry;
 	private ContentModelManager contentModelManager = null;
+	private List<Consumer<ContentModelManager>> contentModelManagerListeners;
 
 	public ContentModelManagerManager(XMLExtensionsRegistry registry) {
 		this.registry = registry;
+		this.contentModelManagerListeners = new ArrayList<>();
 	}
 
 	/**
@@ -43,7 +49,19 @@ public class ContentModelManagerManager {
 				break;
 			}
 		}
+		for (Consumer<ContentModelManager> listener : contentModelManagerListeners) {
+			listener.accept(contentModelManager);
+		}
 		return contentModelManager;
+	}
+
+	public void registerContentModelListener(Consumer<ContentModelManager> fn) {
+		if (contentModelManager != null) {
+			fn.accept(contentModelManager);
+			return;
+		}
+		contentModelManagerListeners.add(fn);
+		contentModelManagerListeners = null;
 	}
 
 }
