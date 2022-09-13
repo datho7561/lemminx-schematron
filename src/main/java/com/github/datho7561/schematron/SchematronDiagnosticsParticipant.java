@@ -7,7 +7,7 @@
 * Contributors:
 *     Red Hat Inc. - initial API and implementation
 *******************************************************************************/
-package com.github.datho7561;
+package com.github.datho7561.schematron;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +30,8 @@ import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipa
 import org.eclipse.lemminx.uriresolver.CacheResourcesManager;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
+
+import com.github.datho7561.common.ContentModelManagerManager;
 
 /**
  * Provide diagnostics based on Schematron schemas referenced through

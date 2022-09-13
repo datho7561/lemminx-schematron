@@ -7,7 +7,7 @@
 * Contributors:
 *     Red Hat Inc. - initial API and implementation
 *******************************************************************************/
-package com.github.datho7561;
+package com.github.datho7561.schematron;
 
 import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelProvider;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
@@ -15,6 +15,8 @@ import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
 import org.eclipse.lsp4j.InitializeParams;
+
+import com.github.datho7561.common.ContentModelManagerManager;
 
 /**
  * Schematron extension. It supports:

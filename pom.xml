@@ -12,8 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <junit.version>5.7.1</junit.version>
     <lemminx.version>0.20.0</lemminx.version>
   </properties>
@@ -113,6 +113,12 @@
                 <exclude>META-INF/*.SF</exclude>
                 <exclude>META-INF/*.DSA</exclude>
                 <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>*:Saxon-HE</artifact>
+              <excludes>
+                <exclude>META-INF/services/javax.xml.transform.TransformerFactory</exclude>
               </excludes>
             </filter>
           </filters>

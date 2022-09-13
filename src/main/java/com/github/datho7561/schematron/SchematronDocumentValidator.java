@@ -7,7 +7,7 @@
 * Contributors:
 *     Red Hat Inc. - initial API and implementation
 *******************************************************************************/
-package com.github.datho7561;
+package com.github.datho7561.schematron;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
