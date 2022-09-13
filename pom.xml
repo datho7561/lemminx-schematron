@@ -43,6 +43,11 @@
       <artifactId>java</artifactId>
       <version>3.1.1</version>
     </dependency>
+    <dependency>
+      <groupId>net.java.dev.msv</groupId>
+      <artifactId>msv-core</artifactId>
+      <version>2022.7</version>
+    </dependency>
     <!-- Test -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>

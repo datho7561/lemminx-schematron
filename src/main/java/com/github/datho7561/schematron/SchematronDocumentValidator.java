@@ -38,6 +38,8 @@ import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.github.datho7561.common.ISchemaBasedValidator;
+
 import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
@@ -47,7 +49,7 @@ import name.dmaus.schxslt.SchematronException;
  *
  * @author datho7561
  */
-public class SchematronDocumentValidator {
+public class SchematronDocumentValidator implements ISchemaBasedValidator {
 
 	private static final Range ZERO_RANGE = new Range(new Position(0, 0), new Position(0, 1));
 
