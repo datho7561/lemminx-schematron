@@ -31,8 +31,6 @@ import org.eclipse.lemminx.uriresolver.CacheResourcesManager;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 
-import com.github.datho7561.schematron.SchematronDocumentValidator;
-
 public abstract class AbstractXmlModelDiagnosticsParticipant implements IDiagnosticsParticipant {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractXmlModelDiagnosticsParticipant.class.getName());

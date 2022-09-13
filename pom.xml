@@ -39,11 +39,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>name.dmaus.schxslt</groupId>
-      <artifactId>java</artifactId>
-      <version>3.1.1</version>
-    </dependency>
-    <dependency>
       <groupId>net.java.dev.msv</groupId>
       <artifactId>msv-core</artifactId>
       <version>2022.7</version>
@@ -118,12 +113,6 @@
                 <exclude>META-INF/*.SF</exclude>
                 <exclude>META-INF/*.DSA</exclude>
                 <exclude>META-INF/*.RSA</exclude>
-              </excludes>
-            </filter>
-            <filter>
-              <artifact>*:Saxon-HE</artifact>
-              <excludes>
-                <exclude>META-INF/services/javax.xml.transform.TransformerFactory</exclude>
               </excludes>
             </filter>
           </filters>
