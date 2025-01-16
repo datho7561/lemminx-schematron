@@ -23,6 +23,7 @@ It uses [schxslt](https://github.com/schxslt/schxslt) and [Saxon-HE](https://sax
 
 ## Limitations
 
+* Requires Java 11
 * You can only validate with local `.sch` files
 * Not tested thoroughly
 * The `.jar` is prohibitively large to include as a part of the standard LemMinX distribution
