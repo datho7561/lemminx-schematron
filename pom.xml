@@ -15,7 +15,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <junit.version>5.11.4</junit.version>
-    <lemminx.version>0.20.0</lemminx.version>
+    <lemminx.version>0.29.0</lemminx.version>
   </properties>
 
   <repositories>
