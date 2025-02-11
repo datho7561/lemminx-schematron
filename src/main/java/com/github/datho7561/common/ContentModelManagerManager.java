@@ -29,7 +29,17 @@ public class ContentModelManagerManager {
 	private ContentModelManager contentModelManager = null;
 	private List<Consumer<ContentModelManager>> contentModelManagerListeners;
 
-	public ContentModelManagerManager(XMLExtensionsRegistry registry) {
+	private static ContentModelManagerManager INSTANCE;
+
+	public static ContentModelManagerManager getInstance(XMLExtensionsRegistry registry) {
+		if (INSTANCE != null) {
+			return INSTANCE;
+		}
+		INSTANCE = new ContentModelManagerManager(registry);
+		return INSTANCE;
+	}
+
+	private ContentModelManagerManager(XMLExtensionsRegistry registry) {
 		this.registry = registry;
 		this.contentModelManagerListeners = new ArrayList<>();
 	}
@@ -52,6 +62,7 @@ public class ContentModelManagerManager {
 		for (Consumer<ContentModelManager> listener : contentModelManagerListeners) {
 			listener.accept(contentModelManager);
 		}
+		contentModelManagerListeners = null;
 		return contentModelManager;
 	}
 
@@ -61,7 +72,6 @@ public class ContentModelManagerManager {
 			return;
 		}
 		contentModelManagerListeners.add(fn);
-		contentModelManagerListeners = null;
 	}
 
 }

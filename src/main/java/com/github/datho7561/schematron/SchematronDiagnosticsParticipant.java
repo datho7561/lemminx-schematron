@@ -15,11 +15,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelManager;
@@ -47,7 +50,7 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 	private ContentModelManagerManager contentModelManagerManager;
 
 	public SchematronDiagnosticsParticipant(XMLExtensionsRegistry registry) {
-		this.contentModelManagerManager = new ContentModelManagerManager(registry);
+		this.contentModelManagerManager = ContentModelManagerManager.getInstance(registry);
 	}
 
 	@Override
@@ -76,11 +79,11 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 		}
 
 		Set<ReferencedGrammarInfo> grammars = contentModelManager.getReferencedGrammarInfos(xmlDocument);
-		List<File> schematronFiles = new ArrayList<>();
+		Map<String, File> schematronFiles = new HashMap<>();
 
 		for (ReferencedGrammarInfo grammar : grammars) {
 			if (grammar != null && grammar.getIdentifier() != null
-					&& "xml-model".equals(grammar.getIdentifier().getKind())) {
+					&& SchematronModelProvider.SCHEMATRON_XML_MODEL_BINDING_KIND.equals(grammar.getIdentifier().getKind())) {
 				URI uri = null;
 				try {
 					uri = new URI(grammar.getResolvedURIInfo().getResolvedURI());
@@ -103,22 +106,29 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 			}
 		}
 
-		return schematronFiles.size() > 0 ? schematronFiles : null;
+		return !schematronFiles.entrySet().isEmpty() ? schematronFiles.values().stream().collect(Collectors.toList()) : null;
 	}
 
-	private static void collectLocalSchematron(URI uri, List<File> schematronFiles) {
+	private static void collectLocalSchematron(URI uri, Map<String, File> schematronFiles) {
+		if (schematronFiles.containsKey(uri.toString())) {
+			return;
+		}
 		File file = new File(uri);
 		if (file.exists()) {
-			schematronFiles.add(file);
+			schematronFiles.put(uri.toString(), file);
 		}
 	}
 
-	private static void collectRemoteSchematron(URI uri, List<File> schematronFiles, ContentModelManager contentModelManager) {
+	private static void collectRemoteSchematron(URI uri, Map<String, File> schematronFiles,
+			ContentModelManager contentModelManager) {
+		if (schematronFiles.containsKey(uri.toString())) {
+			return;
+		}
 		try {
 			Path cachedFilePath = CacheResourcesManager.getResourceCachePath(uri.toString());
 			File file = cachedFilePath.toFile();
 			if (file.exists()) {
-				schematronFiles.add(file);
+				schematronFiles.put(uri.toString(), file);
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Error while collecting Schematron `" + uri + "`: ", e);
