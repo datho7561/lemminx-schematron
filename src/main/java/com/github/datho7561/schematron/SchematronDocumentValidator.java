@@ -38,6 +38,7 @@ import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
@@ -70,6 +71,7 @@ public class SchematronDocumentValidator {
 	 * @param cancelChecker the cancel checker
 	 * @return a list of diagnostics for the XML document
 	 */
+	@SuppressFBWarnings({"DCN_NULLPOINTER_EXCEPTION"})
 	public List<Diagnostic> validate(DOMDocument xmlDocument, List<File> schemaFiles, CancelChecker cancelChecker) {
 		List<Diagnostic> diagnostics = new ArrayList<>();
 		for (File schema : schemaFiles) {

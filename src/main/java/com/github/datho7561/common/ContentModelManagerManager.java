@@ -18,6 +18,8 @@ import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelManager;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Manages access to LemMinX's ContentModelManager
  *
@@ -31,7 +33,7 @@ public class ContentModelManagerManager {
 
 	private static ContentModelManagerManager INSTANCE;
 
-	public static ContentModelManagerManager getInstance(XMLExtensionsRegistry registry) {
+	public static synchronized ContentModelManagerManager getInstance(XMLExtensionsRegistry registry) {
 		if (INSTANCE != null) {
 			return INSTANCE;
 		}
@@ -49,6 +51,7 @@ public class ContentModelManagerManager {
 	 *
 	 * @return LemMinX's ContentModelManager or null if it is not yet available
 	 */
+	@SuppressFBWarnings({"EI_EXPOSE_REP"})
 	public ContentModelManager getContentModelManager() {
 		if (contentModelManager != null) {
 			return contentModelManager;

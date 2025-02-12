@@ -12,18 +12,11 @@ import org.eclipse.lemminx.dom.XMLModel;
 import org.eclipse.lemminx.extensions.contentmodel.model.CMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.model.CMElementDeclaration;
 import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelProvider;
-import org.eclipse.lemminx.uriresolver.URIResolverExtensionManager;
 import org.eclipse.lsp4j.LocationLink;
 
 public class SchematronModelProvider implements ContentModelProvider {
 
 	public static final String SCHEMATRON_XML_MODEL_BINDING_KIND = "schematron-xml-model";
-
-	private final URIResolverExtensionManager resolverExtensionManager;
-
-	public SchematronModelProvider(URIResolverExtensionManager resolverExtensionManager) {
-		this.resolverExtensionManager = resolverExtensionManager;
-	}
 
 	public static class SchematronCMDocument implements CMDocument {
 

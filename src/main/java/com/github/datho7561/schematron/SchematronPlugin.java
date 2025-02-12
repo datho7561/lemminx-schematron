@@ -40,7 +40,7 @@ public class SchematronPlugin implements IXMLExtension {
 		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
 
-		ContentModelProvider modelProvider = new SchematronModelProvider(registry.getResolverExtensionManager());
+		ContentModelProvider modelProvider = new SchematronModelProvider();
 		contentModelManagerManager = ContentModelManagerManager.getInstance(registry);
 		contentModelManagerManager.registerContentModelListener((cm) -> {
 			cm.registerModelProvider(modelProvider);

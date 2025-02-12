@@ -14,15 +14,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.model.ContentModelManager;
@@ -100,6 +99,9 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 						case "https":
 						case "ftp":
 							collectRemoteSchematron(uri, schematronFiles, contentModelManager);
+							break;
+						default:
+							// do nothing
 							break;
 					}
 				}
