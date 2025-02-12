@@ -1,2 +1,6 @@
 /target
 /target/**
+.classpath
+.classpath/**
+.settings
+.settings/**

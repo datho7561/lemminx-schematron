@@ -59,7 +59,7 @@ You will get validation based on the Schematron rules:
 ## Requirements
 
 - Red Hat's vscode-xml extension
-- Java 11 or newer (it doesn't work with the binary mode)
+- Java 17 or newer (it doesn't work with the binary mode)
 
 ## Known Issues
 
