@@ -46,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
+import name.dmaus.schxslt.adapter.SchXslt;
 
 /**
  * Validates an XML document using Schematron schemas
@@ -90,7 +91,7 @@ public class SchematronDocumentValidator {
 		for (File schema : schemaFiles) {
 			Schematron schematron = null;
 			try {
-				schematron = new Schematron(new StreamSource(schema));
+				schematron = new Schematron(new SchXslt(), new StreamSource(schema));
 			} catch (RuntimeException | SchematronException e) {
 				// FIXME: Use the path to the schema
 				LOGGER.log(Level.WARNING, "Error while processing the schema", e);

@@ -6,7 +6,7 @@ It uses [schxslt](https://github.com/schxslt/schxslt) and [Saxon-HE](https://sax
 
 ## Requirements
 
-- Java 11+ (JRE or JDK) installed and set up on `PATH`.
+- Java 17+ (JRE or JDK) installed and set up on `PATH`.
 
 ## Usage
 
@@ -61,7 +61,7 @@ args = ["-cp", "/home/davthomp/Documents/lemminx-extensions/lemminx-schematron-0
 
 ### lemminx extension
 
-_Prerequisites_: git, Java 11 or newer
+_Prerequisites_: git, Java 17 or newer
 
 1. Clone this repo.
 2. `cd` into `lemminx-schematron`
@@ -70,7 +70,7 @@ _Prerequisites_: git, Java 11 or newer
 
 ### vscode extension
 
-_Prerequisites_: git, Java 11 or newer, NodeJS 20 or newer, __macOS or Linux__ (the `npm` scripts I wrote are not cross platform)
+_Prerequisites_: git, Java 17 or newer, NodeJS 20 or newer, __macOS or Linux__ (the `npm` scripts I wrote are not cross platform)
 
 1. Clone this repo.
 2. `cd` into `vscode-schematron`
