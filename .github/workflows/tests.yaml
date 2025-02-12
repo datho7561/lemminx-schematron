@@ -17,4 +17,19 @@ jobs:
           architecture: x64
           cache: maven
       - name: Run the Maven verify phase
+        working-directory: "lemminx-schematron"
         run: mvn --batch-mode --update-snapshots verify
+  VSCode-Extension-Verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 11 for x64
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install node deps
+        working-directory: "vscode-schematron"
+        run: npm ci
+      - name: Run VS Code extension tests
+        working-directory: "vscode-schematron"
+        run: xvfb-run npm test

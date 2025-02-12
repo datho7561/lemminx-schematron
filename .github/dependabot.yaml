@@ -1,6 +1,10 @@
 version: 2
 updates:
 - package-ecosystem: "maven"
-  directory: "/"
+  directory: "/lemminx-schematron"
+  schedule:
+    interval: "weekly"
+- package-ecosystem: "npm"
+  directory: "/vscode-schematron"
   schedule:
     interval: "weekly"
