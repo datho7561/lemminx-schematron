@@ -1,0 +1,32 @@
+name: Publish VS Code Extension
+on: workflow_dispatch
+jobs:
+  Build-Extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Set up JDK 11 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          architecture: x64
+          cache: maven
+      - name: Install node deps
+        working-directory: "vscode-schematron"
+        run: npm ci
+      - name: Install extension packaging tools
+        run: npm i -g @vscode/vsce ovsx
+      - name: Package extension
+        working-directory: "vscode-schematron"
+        run: vsce package
+      - name: Publish to VS Code Marketplace
+        working-directory: "vscode-schematron"
+        run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
+      - name: Publish to OpenVSX
+        working-directory: "vscode-schematron"
+        run: ovsx publish -p ${{ secrets.OVSX_TOKEN }}
