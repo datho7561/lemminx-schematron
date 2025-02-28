@@ -1,5 +1,5 @@
 node_modules
-jars
+jars/*.jar
 dist
 out
 .vscode-test
