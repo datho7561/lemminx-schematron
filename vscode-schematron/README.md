@@ -10,38 +10,46 @@ This is a proof of concept; it's not supported in any capacity, nor is it offici
 
 ### Schematron validation
 
-Given the local schema `assert-gender-title.sch`:
+Given the local schema `dress-size.sch`:
 
 ```xml
+<?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://purl.oclc.org/dsdl/schematron">
-  <pattern name="Check structure">
-    <rule context="Person">
-      <assert test="@Honourific">The element Person must have an Honourific attribute</assert>
-      <assert test="count(*) = 2 and count(Name) = 1 and count(Gender) = 1">The element Person should have the child elements Name and Gender.</assert>
-      <assert test="*[1] = Name">The element Name must appear before element Gender.</assert>
+  <pattern name="Check Cart structure">
+    <rule context="Cart">
+      <assert test="@UUID">The cart must have a UUID</assert>
+      <assert test="count(*) = count(Dress)">Only dresses are allowed in the cart</assert>
     </rule>
   </pattern>
-  <pattern name="Check co-occurrence constraints">
-    <rule context="Person">
-      <assert test="(@Honourific = 'Mr' and Gender = 'Male') or @Honourific != 'Mr'">If the honourific "Mr" is used, the gender must be "Male".</assert>
+  <pattern name="check uuid">
+    <rule context="Cart/@UUID">
+      <assert test="string-length(.) = 36">The UUID should be 36 characters long</assert>
+      <!-- https://stackoverflow.com/a/12301127 -->
+      <assert test="translate(., translate(., '-', ''), '')='----'">The UUID should have 4 hyphens</assert>
+    </rule>
+  </pattern>
+  <pattern name="Check Dress Structure">
+    <rule context="Dress">
+      <assert test="(@Size and @Colour) or @SKU">Dresses must be identified by their SKU, or by their size and colour</assert>
+    </rule>
+  </pattern>
+  <pattern name="Check Dress Size">
+    <rule context="Dress/@Size">
+      <assert test="(. = 'S' or . = 'M' or . = 'L' or . = 'XL') or (floor(.) = number(.) and number(.) &gt;= 0 and number(.) &lt;= 30)">The size must be S, M, L, or XL, or a number between 0 and 30.</assert>
     </rule>
   </pattern>
 </schema>
 ```
 
-*I think it's fine to use whatever honourific regardless of your gender, but this Schematron sure has different opinions, and it's one of the simple example schemas floating around on the internet. I'll try to remember to replace it with a better example later.*
-
 You can associate this schema to your XML document using the `<?xml-model ...?>` prolog instruction:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model
-    href="./assert-title-gender.sch"
-    type="application/xml"?>
-<Person Title="Mr">
-    <Name>Mira</Name>
-    <Gender>Female</Gender>
-</Person>
+<?xml-model href="dress-size.sch" type="application/xml"?>
+<Cart UUID="00000000-0000-0000-0000-000000000000">
+    <Dress Colour="Burgandy" Size=""></Dress>
+    <Dress SKU="37"></Dress>
+</Cart>
 ```
 
 You will get validation based on the Schematron rules:
