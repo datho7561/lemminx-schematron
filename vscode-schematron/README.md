@@ -54,7 +54,7 @@ You can associate this schema to your XML document using the `<?xml-model ...?>`
 
 You will get validation based on the Schematron rules:
 
-![Validation for the XML Document against the schema. The assertion error: "If the honourific "Mr" is used, the gender must be "Male"." appears](./images/validation.png)
+![Validation for the XML Document against the schema. The assertion error: "The size must be S, M, L, or XL, or a number between 0 and 30." appears](./images/validation.png)
 
 ## Requirements
 
