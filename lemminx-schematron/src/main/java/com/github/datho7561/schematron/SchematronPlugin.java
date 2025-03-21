@@ -15,6 +15,7 @@ import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lemminx.uriresolver.URIResolverExtension;
 
 import com.github.datho7561.common.ContentModelManagerManager;
 
@@ -28,6 +29,7 @@ import com.github.datho7561.common.ContentModelManagerManager;
 public class SchematronPlugin implements IXMLExtension {
 
 	private IDiagnosticsParticipant diagnosticsParticipant;
+	private URIResolverExtension metaschemaRncURIResolverParticipant;
 	private ContentModelManagerManager contentModelManagerManager;
 
 	@Override
@@ -39,6 +41,8 @@ public class SchematronPlugin implements IXMLExtension {
 	public void start(InitializeParams params, XMLExtensionsRegistry registry) {
 		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
+		metaschemaRncURIResolverParticipant = new SchematronMetaschemaResolverParticipant();
+		registry.getResolverExtensionManager().registerResolver(metaschemaRncURIResolverParticipant);
 
 		ContentModelProvider modelProvider = new SchematronModelProvider();
 		contentModelManagerManager = ContentModelManagerManager.getInstance(registry);
@@ -50,6 +54,7 @@ public class SchematronPlugin implements IXMLExtension {
 	@Override
 	public void stop(XMLExtensionsRegistry registry) {
 		registry.unregisterDiagnosticsParticipant(diagnosticsParticipant);
+		registry.getResolverExtensionManager().unregisterResolver(metaschemaRncURIResolverParticipant);
 	}
 
 }
