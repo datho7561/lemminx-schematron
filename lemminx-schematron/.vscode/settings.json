@@ -4,5 +4,6 @@
     "vmArgs": [
       "-noverify"
     ]
-  }
+  },
+  "java.compile.nullAnalysis.mode": "disabled"
 }
