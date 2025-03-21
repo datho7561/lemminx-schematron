@@ -97,6 +97,28 @@
         </dependencies>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <!-- Download copies of all transitive dependencies, then remove all jarsigner signatures
+          from those dependencies. This is needed to prevent the classloader from complaining about
+          lemminx adding classes into the jing packages, which causes problems when attempting to
+          use the RelaxNG features (sometimes failing silently!) -->
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <excludes>META-INF/*.SF,META-INF/*.DSA,META-INF/*.RSA</excludes>
+              <outputDirectory>${project.build.directory}/designatured</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.6.0</version>
         <executions>
@@ -149,6 +171,14 @@
         <version>3.5.2</version>
         <configuration>
           <argLine>-noverify</argLine>
+          <!-- use the copies of the dependencies that have the jarsignatures removed in order to prevent the
+          classloader from throwing an error because lemminx adds classes into the jing package. -->
+          <additionalClasspathElements>
+            <additionalClasspathElement>${project.build.directory}/designatured</additionalClasspathElement>
+          </additionalClasspathElements>
+          <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>
+          <classpathDependencyScopeExclude>runtime</classpathDependencyScopeExclude>
+          <classpathDependencyScopeExclude>test</classpathDependencyScopeExclude>
         </configuration>
       </plugin>
     </plugins>

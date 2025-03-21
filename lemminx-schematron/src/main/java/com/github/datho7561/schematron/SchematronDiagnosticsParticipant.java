@@ -82,7 +82,8 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 
 		for (ReferencedGrammarInfo grammar : grammars) {
 			if (grammar != null && grammar.getIdentifier() != null
-					&& SchematronModelProvider.SCHEMATRON_XML_MODEL_BINDING_KIND.equals(grammar.getIdentifier().getKind())) {
+					&& SchematronModelProvider.SCHEMATRON_XML_MODEL_BINDING_KIND
+							.equals(grammar.getIdentifier().getKind())) {
 				URI uri = null;
 				try {
 					uri = new URI(grammar.getResolvedURIInfo().getResolvedURI());
@@ -108,7 +109,8 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 			}
 		}
 
-		return !schematronFiles.entrySet().isEmpty() ? schematronFiles.values().stream().collect(Collectors.toList()) : null;
+		return !schematronFiles.entrySet().isEmpty() ? schematronFiles.values().stream().collect(Collectors.toList())
+				: null;
 	}
 
 	private static void collectLocalSchematron(URI uri, Map<String, File> schematronFiles) {
