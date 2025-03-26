@@ -39,13 +39,14 @@
   "scripts": {
     "vscode:prepublish": "npm run package && npm run jars",
     "jars": "mvn package -f ../lemminx-schematron && mv ../lemminx-schematron/target/lemminx-schematron*.jar jars/lemminx-schematron.jar",
+    "fast-jars": "mvn package -q -DskipTests -f ../lemminx-schematron && mv ../lemminx-schematron/target/lemminx-schematron*.jar jars/lemminx-schematron.jar",
     "compile": "npm run lint",
     "watch": "npm-run-all -p watch:*",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run lint",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "pretest": "npm run compile-tests && npm run compile && npm run fast-jars",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test": "vscode-test"
