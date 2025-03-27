@@ -26,7 +26,7 @@ jobs:
         run: vsce package
       - name: Publish to VS Code Marketplace
         working-directory: "vscode-schematron"
-        run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
+        run: 'vsce publish -p ${{ secrets.VSCE_TOKEN }} --packagePath *.vsix'
       - name: Publish to OpenVSX
         working-directory: "vscode-schematron"
-        run: ovsx publish -p ${{ secrets.OVSX_TOKEN }}
+        run: 'ovsx publish -p ${{ secrets.OVSX_TOKEN }} --packagePath *.vsix'
