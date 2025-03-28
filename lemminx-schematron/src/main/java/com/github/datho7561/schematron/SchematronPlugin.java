@@ -29,6 +29,7 @@ import com.github.datho7561.common.ContentModelManagerManager;
 public class SchematronPlugin implements IXMLExtension {
 
 	private IDiagnosticsParticipant diagnosticsParticipant;
+	private IDiagnosticsParticipant metaschemaSchDiagnosticsParticipant;
 	private URIResolverExtension metaschemaRncURIResolverParticipant;
 	private ContentModelManagerManager contentModelManagerManager;
 
@@ -41,6 +42,8 @@ public class SchematronPlugin implements IXMLExtension {
 	public void start(InitializeParams params, XMLExtensionsRegistry registry) {
 		diagnosticsParticipant = new SchematronDiagnosticsParticipant(registry);
 		registry.registerDiagnosticsParticipant(diagnosticsParticipant);
+		metaschemaSchDiagnosticsParticipant = new SchematronMetaschemaSchDiagnosticsParticipant();
+		registry.registerDiagnosticsParticipant(metaschemaSchDiagnosticsParticipant);
 		metaschemaRncURIResolverParticipant = new SchematronMetaschemaResolverParticipant();
 		registry.getResolverExtensionManager().registerResolver(metaschemaRncURIResolverParticipant);
 
@@ -54,6 +57,7 @@ public class SchematronPlugin implements IXMLExtension {
 	@Override
 	public void stop(XMLExtensionsRegistry registry) {
 		registry.unregisterDiagnosticsParticipant(diagnosticsParticipant);
+		registry.unregisterDiagnosticsParticipant(metaschemaSchDiagnosticsParticipant);
 		registry.getResolverExtensionManager().unregisterResolver(metaschemaRncURIResolverParticipant);
 	}
 

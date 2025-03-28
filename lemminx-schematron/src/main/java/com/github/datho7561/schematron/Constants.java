@@ -17,4 +17,5 @@ public class Constants {
 
 	// https://github.com/Schematron/schema
 	public static final String SCHEMATRON_RNC = "https://raw.githubusercontent.com/Schematron/schema/refs/heads/main/schematron.rnc";
+	public static final String SCHEMATRON_SCH = "https://raw.githubusercontent.com/Schematron/schema/refs/heads/main/schematron.sch";
 }
