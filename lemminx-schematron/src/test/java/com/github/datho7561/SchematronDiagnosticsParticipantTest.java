@@ -51,7 +51,7 @@ public class SchematronDiagnosticsParticipantTest extends AbstractCacheBasedTest
 				"  <Gender>Female</Gender>\n" + //
 				"</Person>";
 		XMLAssert.testDiagnosticsFor(xml, d(r(1, 1, 1, 7),
-				"If the Title is \"Mr\" then the gender of the person must be \"Male\".", "failed-assert"));
+				"If the Title is \"Mr\" then the gender of the person must be \"Male\".", "schematron-failed-assert"));
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class SchematronDiagnosticsParticipantTest extends AbstractCacheBasedTest
 
 		// diagnostics appear, since the file should be cached
 		XMLAssert.testDiagnosticsFor(xml, d(r(1, 1, 1, 7),
-				"If the Title is \"Mr\" then the gender of the person must be \"Male\".", "failed-assert"));
+				"If the Title is \"Mr\" then the gender of the person must be \"Male\".", "schematron-failed-assert"));
 	}
 
 }
