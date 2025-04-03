@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,12 +56,11 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 	@Override
 	public void doDiagnostics(DOMDocument xmlDocument, List<Diagnostic> diagnostics,
 			XMLValidationSettings validationSettings, CancelChecker cancelChecker) {
-		List<File> files = getSchemaFiles(xmlDocument);
-		if (files == null) {
-			return;
-		}
+		List<File> files = getSchemaFiles(xmlDocument, diagnostics);
 		cancelChecker.checkCanceled();
-		diagnostics.addAll(validator.validate(xmlDocument, files, cancelChecker));
+		if (!files.isEmpty()) {
+			diagnostics.addAll(validator.validate(xmlDocument, files, cancelChecker));
+		}
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 	 * @return a list of the resolved location of all the schemas as URIs, or null
 	 *         if there are no schemas
 	 */
-	private List<File> getSchemaFiles(DOMDocument xmlDocument) {
+	private List<File> getSchemaFiles(DOMDocument xmlDocument, List<Diagnostic> diagnostics) {
 		ContentModelManager contentModelManager = contentModelManagerManager.getContentModelManager();
 		if (contentModelManager == null) {
 			return Collections.emptyList();
@@ -79,6 +79,7 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 
 		Set<ReferencedGrammarInfo> grammars = contentModelManager.getReferencedGrammarInfos(xmlDocument);
 		Map<String, File> schematronFiles = new HashMap<>();
+		Set<String> nonExistantFiles = new HashSet<>();
 
 		for (ReferencedGrammarInfo grammar : grammars) {
 			if (grammar != null && grammar.getIdentifier() != null
@@ -93,12 +94,12 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 				if (uri != null) {
 					switch (uri.getScheme()) {
 						case "file":
-							collectLocalSchematron(uri, schematronFiles);
+							collectLocalSchematron(uri, schematronFiles, nonExistantFiles, xmlDocument, diagnostics);
 							break;
 						case "http":
 						case "https":
 						case "ftp":
-							collectRemoteSchematron(uri, schematronFiles, contentModelManager);
+							collectRemoteSchematron(uri, schematronFiles, nonExistantFiles, xmlDocument, diagnostics, contentModelManager);
 							break;
 						default:
 							// do nothing
@@ -108,22 +109,26 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 			}
 		}
 
-		return !schematronFiles.entrySet().isEmpty() ? schematronFiles.values().stream().collect(Collectors.toList()) : null;
+		return !schematronFiles.entrySet().isEmpty() ? schematronFiles.values().stream().collect(Collectors.toList()) : Collections.emptyList();
 	}
 
-	private static void collectLocalSchematron(URI uri, Map<String, File> schematronFiles) {
-		if (schematronFiles.containsKey(uri.toString())) {
+	private static void collectLocalSchematron(URI uri, Map<String, File> schematronFiles, Set<String> nonExistantFiles, DOMDocument xmlDocument, List<Diagnostic> diagnostics) {
+		if (schematronFiles.containsKey(uri.toString()) || nonExistantFiles.contains(uri.toString())) {
 			return;
 		}
 		File file = new File(uri);
 		if (file.exists()) {
 			schematronFiles.put(uri.toString(), file);
+		} else {
+			nonExistantFiles.add(uri.toString());
+			diagnostics.add(DiagnosticUtils.getMissingSchemaDiagnostics(uri, xmlDocument));
 		}
 	}
 
 	private static void collectRemoteSchematron(URI uri, Map<String, File> schematronFiles,
+			Set<String> nonExistantFiles, DOMDocument xmlDocument, List<Diagnostic> diagnostics,
 			ContentModelManager contentModelManager) {
-		if (schematronFiles.containsKey(uri.toString())) {
+		if (schematronFiles.containsKey(uri.toString()) || nonExistantFiles.contains(uri.toString())) {
 			return;
 		}
 		try {
@@ -131,6 +136,9 @@ public class SchematronDiagnosticsParticipant implements IDiagnosticsParticipant
 			File file = cachedFilePath.toFile();
 			if (file.exists()) {
 				schematronFiles.put(uri.toString(), file);
+			} else {
+				nonExistantFiles.add(uri.toString());
+				diagnostics.add(DiagnosticUtils.getMissingSchemaDiagnostics(uri, xmlDocument));
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Error while collecting Schematron `" + uri + "`: ", e);

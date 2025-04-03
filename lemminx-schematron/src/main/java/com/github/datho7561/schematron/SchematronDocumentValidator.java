@@ -34,16 +34,13 @@ import org.eclipse.lemminx.dom.DOMAttr;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMElement;
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.dom.XMLModel;
 import org.eclipse.lemminx.utils.XMLPositionUtility;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
@@ -55,8 +52,6 @@ import name.dmaus.schxslt.adapter.SchXslt;
  * @author datho7561
  */
 public class SchematronDocumentValidator {
-
-	private static final Range ZERO_RANGE = new Range(new Position(0, 0), new Position(0, 1));
 
 	// Example:
 	// failed-assert /Q{}Person[1] If the Title is "Mr" then the gender of the
@@ -86,7 +81,6 @@ public class SchematronDocumentValidator {
 	 * @param cancelChecker the cancel checker
 	 * @return a list of diagnostics for the XML document
 	 */
-	@SuppressFBWarnings({"DCN_NULLPOINTER_EXCEPTION"})
 	public List<Diagnostic> validate(DOMDocument xmlDocument, List<File> schemaFiles, CancelChecker cancelChecker) {
 		List<Diagnostic> diagnostics = new ArrayList<>();
 		for (File schema : schemaFiles) {
@@ -97,7 +91,7 @@ public class SchematronDocumentValidator {
 				// FIXME: Use the path to the schema
 				LOGGER.log(Level.WARNING, "Error while processing the schema", e);
 				String schemaPath = schema.getName();
-				diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath, xmlDocument));
+				diagnostics.add(DiagnosticUtils.getInvalidSchematronDiagnostic(schemaPath, xmlDocument));
 			}
 			if (schematron != null) {
 				try {
@@ -111,11 +105,7 @@ public class SchematronDocumentValidator {
 				} catch (SchematronException e) {
 					// FIXME: Use the path to the schema
 					String schemaPath = schema.getName();
-					diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath, xmlDocument));
-				} catch (NullPointerException npe) {
-					// FIXME: Use the path to the schema
-					String schemaPath = schema.getName();
-					diagnostics.add(getDiagnosticFromSchematronThatBreaksSchxslt(schemaPath, xmlDocument));
+					diagnostics.add(DiagnosticUtils.getInvalidSchematronDiagnostic(schemaPath, xmlDocument));
 				}
 			}
 			cancelChecker.checkCanceled();
@@ -128,7 +118,7 @@ public class SchematronDocumentValidator {
 		// which may span several lines
 		message = message.replace("\r\n", "");
 		message = message.replace("\n", "");
-		Diagnostic d = new Diagnostic(ZERO_RANGE, message);
+		Diagnostic d = new Diagnostic(DiagnosticUtils.ZERO_RANGE, message);
 		d.setCode(FAILED_ASSERT_ERROR_CODE);
 
 		Matcher m = SCHEMATRON_MESSAGE_DECODER.matcher(message);
@@ -235,27 +225,6 @@ public class SchematronDocumentValidator {
 			default:
 				return new Range(xmlDocument.positionAt(node.getStart()), xmlDocument.positionAt(node.getEnd()));
 		}
-	}
-
-	private static Diagnostic getDiagnosticFromInvalidSchematron(String schemaPath, DOMDocument xmlDocument) {
-		Diagnostic d = new Diagnostic(getRangeOfXmlModel(schemaPath, xmlDocument), "Schema " + schemaPath + " is invalid");
-		d.setCode("bad-schematron");
-		return d;
-	}
-
-	private static Diagnostic getDiagnosticFromSchematronThatBreaksSchxslt(String schemaPath, DOMDocument xmlDocument) {
-		Diagnostic d = new Diagnostic(getRangeOfXmlModel(schemaPath, xmlDocument), "The schema parser encountered an error while trying to parse " + schemaPath);
-		d.setCode("schematron-parser-error");
-		return d;
-	}
-	
-	private static Range getRangeOfXmlModel(String schemaPath, DOMDocument xmlDocument) {
-		for (XMLModel xmlModel : xmlDocument.getXMLModels()) {
-			if (xmlModel.getHref().endsWith(schemaPath)) {
-				return XMLPositionUtility.createSelectionRange(xmlModel.getHrefNode());
-			}
-		}
-		return ZERO_RANGE;
 	}
 
 }
