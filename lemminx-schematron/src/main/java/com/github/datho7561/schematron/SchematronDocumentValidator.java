@@ -34,6 +34,7 @@ import org.eclipse.lemminx.dom.DOMAttr;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMElement;
 import org.eclipse.lemminx.dom.DOMNode;
+import org.eclipse.lemminx.dom.XMLModel;
 import org.eclipse.lemminx.utils.XMLPositionUtility;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
@@ -96,7 +97,7 @@ public class SchematronDocumentValidator {
 				// FIXME: Use the path to the schema
 				LOGGER.log(Level.WARNING, "Error while processing the schema", e);
 				String schemaPath = schema.getName();
-				diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
+				diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath, xmlDocument));
 			}
 			if (schematron != null) {
 				try {
@@ -110,11 +111,11 @@ public class SchematronDocumentValidator {
 				} catch (SchematronException e) {
 					// FIXME: Use the path to the schema
 					String schemaPath = schema.getName();
-					diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath));
+					diagnostics.add(getDiagnosticFromInvalidSchematron(schemaPath, xmlDocument));
 				} catch (NullPointerException npe) {
 					// FIXME: Use the path to the schema
 					String schemaPath = schema.getName();
-					diagnostics.add(getDiagnosticFromSchematronThatBreaksSchxslt(schemaPath));
+					diagnostics.add(getDiagnosticFromSchematronThatBreaksSchxslt(schemaPath, xmlDocument));
 				}
 			}
 			cancelChecker.checkCanceled();
@@ -236,18 +237,25 @@ public class SchematronDocumentValidator {
 		}
 	}
 
-	private static Diagnostic getDiagnosticFromInvalidSchematron(String schemaPath) {
-		// FIXME: place the error on the xml-model
-		Diagnostic d = new Diagnostic(ZERO_RANGE, "Schema " + schemaPath + " is invalid");
+	private static Diagnostic getDiagnosticFromInvalidSchematron(String schemaPath, DOMDocument xmlDocument) {
+		Diagnostic d = new Diagnostic(getRangeOfXmlModel(schemaPath, xmlDocument), "Schema " + schemaPath + " is invalid");
 		d.setCode("bad-schematron");
 		return d;
 	}
 
-	private static Diagnostic getDiagnosticFromSchematronThatBreaksSchxslt(String schemaPath) {
-		// FIXME: place the error on the xml-model
-		Diagnostic d = new Diagnostic(ZERO_RANGE, "The schema parser encountered an error while trying to parse " + schemaPath);
+	private static Diagnostic getDiagnosticFromSchematronThatBreaksSchxslt(String schemaPath, DOMDocument xmlDocument) {
+		Diagnostic d = new Diagnostic(getRangeOfXmlModel(schemaPath, xmlDocument), "The schema parser encountered an error while trying to parse " + schemaPath);
 		d.setCode("schematron-parser-error");
 		return d;
+	}
+	
+	private static Range getRangeOfXmlModel(String schemaPath, DOMDocument xmlDocument) {
+		for (XMLModel xmlModel : xmlDocument.getXMLModels()) {
+			if (xmlModel.getHref().endsWith(schemaPath)) {
+				return XMLPositionUtility.createSelectionRange(xmlModel.getHrefNode());
+			}
+		}
+		return ZERO_RANGE;
 	}
 
 }
