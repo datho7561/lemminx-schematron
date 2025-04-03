@@ -30,3 +30,14 @@ jobs:
       - name: Publish to OpenVSX
         working-directory: "vscode-schematron"
         run: 'ovsx publish -p ${{ secrets.OVSX_TOKEN }} --packagePath *.vsix'
+      - name: Prepare Environment Variables
+        run: |
+          echo "EXT_VERSION=$(cat vscode-schematron/package.json | jq -r .version)" >> $GITHUB_ENV
+      - name: Publish to GH Release Tab
+        uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.EXT_VERSION }}"
+          draft: true
+          files: |
+            *.vsix
