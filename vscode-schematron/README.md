@@ -8,7 +8,7 @@ This is a proof of concept; it's not supported in any capacity, nor is it offici
 
 ## Features
 
-### Schematron validation
+### Schematron-based validation
 
 Given the local schema `dress-size.sch`:
 
@@ -55,6 +55,14 @@ You can associate this schema to your XML document using the `<?xml-model ...?>`
 You will get validation based on the Schematron rules:
 
 ![Validation for the XML Document against the schema. The assertion error: "The size must be S, M, L, or XL, or a number between 0 and 30." appears](./images/validation.png)
+
+## Validation of Schematron schemas
+
+If you set the namespace of an XML document to the Schematron namespace
+(i.e. you set `xmlns="http://purl.oclc.org/dsdl/schematron"` as an attribute in the root element),
+the extension will automatically associate the file with to the two Schematron schemas
+from https://github.com/Schematron/schema .
+This means that you get validation and completion while editing your Schematron schemas.
 
 ## Requirements
 
