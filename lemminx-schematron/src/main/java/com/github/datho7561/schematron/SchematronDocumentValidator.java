@@ -13,15 +13,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -30,7 +27,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.eclipse.lemminx.commons.BadLocationException;
-import org.eclipse.lemminx.dom.DOMAttr;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMElement;
 import org.eclipse.lemminx.dom.DOMNode;
@@ -45,6 +41,7 @@ import name.dmaus.schxslt.Result;
 import name.dmaus.schxslt.Schematron;
 import name.dmaus.schxslt.SchematronException;
 import name.dmaus.schxslt.adapter.SchXslt;
+import net.sf.saxon.xpath.XPathFactoryImpl;
 
 /**
  * Validates an XML document using Schematron schemas
@@ -60,16 +57,9 @@ public class SchematronDocumentValidator {
 
 	private static final String FAILED_ASSERT_ERROR_CODE = "schematron-failed-assert";
 
-	// schxslt uses this syntax to represent namespaces in xpaths, but in reality they should be expressed as prefixes
-	// (which are provided to the xpath processor through a mechanism other than the path itself).
-	private static final Pattern XPATH_WEIRD_NAMESPACE = Pattern.compile("Q\\{([^}]+)\\}");
-
-	private final XPathFactory xpathFactory = XPathFactory.newInstance();
+	private final XPathFactory xpathFactory = new XPathFactoryImpl();
 
 	private static final Logger LOGGER = Logger.getLogger(SchematronDocumentValidator.class.getName());
-
-	// something nonsense and long so that it doesn't overlap with prefixes that the user is likely to use
-	private static final String FAKE_PREFIX_TO_USE_FOR_DEFAULT_NS = "banananas";
 
 	/**
 	 * Returns a list of diagnostics for an XML document given the Schematron
@@ -144,32 +134,6 @@ public class SchematronDocumentValidator {
 	private DOMNode getNodeFromXPathExpression(String xpathExpression, DOMDocument xmlDocument) {
 		try {
 			XPath xpath = xpathFactory.newXPath();
-			xpath.setNamespaceContext(new NamespaceContext() {
-
-				@Override
-				public String getNamespaceURI(String prefix) {
-					switch (prefix) {
-						case FAKE_PREFIX_TO_USE_FOR_DEFAULT_NS:
-							return xmlDocument.getDocumentElement().getAttribute("xmlns");
-					}
-					return xmlDocument.getDocumentElement().getAttribute("xmlns:" + prefix);
-				}
-
-				@Override
-				public String getPrefix(String namespaceURI) {
-					return lookupPrefix(xmlDocument, namespaceURI);
-				}
-
-				@Override
-				public Iterator<String> getPrefixes(String namespaceURI) {
-					String prefix = lookupPrefix(xmlDocument, namespaceURI);
-					if (prefix == null) {
-						return Collections.emptyIterator();
-					}
-					return List.of(prefix).iterator();
-				}
-
-			});
 			XPathExpression compiledExpression = xpath.compile(xpathExpression);
 			NodeList nodeList = (NodeList) compiledExpression.evaluate(xmlDocument, XPathConstants.NODESET);
 			if (nodeList.getLength() > 0) {
@@ -183,38 +147,7 @@ public class SchematronDocumentValidator {
 	}
 
 	private static String getSanitizedXPathExpression(String xpathExpression, DOMDocument domDocument) {
-
-		// remove the blank namespace for elements with a blank namespace
-		xpathExpression = xpathExpression.replace("Q{}", "");
-
-		// replace the Q{https://example.com/namespace} with the prefix used in root element
-		Matcher m = XPATH_WEIRD_NAMESPACE.matcher(xpathExpression);
-		while (m.find()) {
-			String namespaceUri = m.group(1);
-			String prefix = lookupPrefix(domDocument, namespaceUri);
-			if (prefix != null && prefix.isEmpty()) {
-				xpathExpression = m.replaceFirst(FAKE_PREFIX_TO_USE_FOR_DEFAULT_NS + ":");
-			} else if (prefix != null) {
-				xpathExpression = m.replaceFirst(prefix + ":");
-			} else {
-				xpathExpression = m.replaceFirst("");
-			}
-			m = XPATH_WEIRD_NAMESPACE.matcher(xpathExpression);
-		}
-
 		return xpathExpression.replaceFirst("\\[1\\]", "");
-	}
-
-	private static String lookupPrefix(DOMDocument domDocument, String namespaceUri) {
-		if (namespaceUri.equals(domDocument.getDocumentElement().getAttribute("xmlns"))) {
-			return "";
-		}
-		for (DOMAttr attr : domDocument.getDocumentElement().getAttributeNodes()) {
-			if (namespaceUri.equals(attr.getValue()) && attr.getName().startsWith("xmlns:")) {
-				return attr.getName().substring("xmlns:".length());
-			}
-		}
-		return null;
 	}
 
 	private static Range getRangeFromDOMNode(DOMNode node, DOMDocument xmlDocument) throws BadLocationException {
