@@ -76,6 +76,18 @@ public class SchematronDiagnosticsParticipantTest extends AbstractCacheBasedTest
 				"</Person>";
 		XMLAssert.testDiagnosticsFor(xml);
 	}
+	
+	@Test
+	public void testValidationMissingSchematron() {
+		String xml = "<?xml-model href=\"src/test/resources/schematron/node.sch\" type=\"application/xml\" schematypens=\"http://www.ascc.net/xml/schematron\"?>\n"
+				+ //
+				"<Person Title=\"Mr\">\n" + //
+				"  <Name>Eddie</Name>\n" + //
+				"  <Gender>Female</Gender>\n" + //
+				"</Person>";
+		XMLAssert.testDiagnosticsFor(xml,
+				d(r(0, 17, 0, 57), "Schema node.sch is missing", "missing-schematron"));
+	}
 
 	@Test
 	@Disabled("Cannot replicate diagnostics working in unit tests")
