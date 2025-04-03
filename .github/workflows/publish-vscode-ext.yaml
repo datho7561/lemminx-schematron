@@ -40,4 +40,4 @@ jobs:
           automatic_release_tag: "${{ env.EXT_VERSION }}"
           draft: true
           files: |
-            *.vsix
+            vscode-schematron/*.vsix
