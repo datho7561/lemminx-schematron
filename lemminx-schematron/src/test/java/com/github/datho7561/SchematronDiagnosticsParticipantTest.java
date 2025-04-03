@@ -62,9 +62,8 @@ public class SchematronDiagnosticsParticipantTest extends AbstractCacheBasedTest
 				"  <Name>Eddie</Name>\n" + //
 				"  <Gender>Female</Gender>\n" + //
 				"</Person>";
-		// FIXME:
 		XMLAssert.testDiagnosticsFor(xml,
-				d(r(0, 0, 0, 1), "Schema invalid.sch is invalid", "bad-schematron"));
+				d(r(0, 17, 0, 60), "Schema invalid.sch is invalid", "bad-schematron"));
 	}
 
 	@Test
