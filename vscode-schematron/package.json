@@ -2,7 +2,7 @@
   "name": "vscode-lemminx-schematron",
   "displayName": "VSCode Lemminx Schematron",
   "description": "Extends Red Hat's vscode-xml with Schematron support",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "datho7561",
   "author": {
     "name": "David Thompson",
