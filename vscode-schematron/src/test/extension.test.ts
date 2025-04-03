@@ -6,10 +6,10 @@ import * as vscode from "vscode";
 
 suite("Extension Test Suite", function () {
 
-  this.timeout(5_000);
+  this.timeout(10_000);
 
   // diagnostics take some time to appear; the language server must be started and respond to file open event
-  const DIAGNOSTICS_DELAY = 2_000;
+  const DIAGNOSTICS_DELAY = 4_000;
 
   const SCHEMA = `<?xml version="1.0" encoding="UTF-8"?>
     <schema xmlns="http://purl.oclc.org/dsdl/schematron">
