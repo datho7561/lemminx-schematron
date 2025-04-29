@@ -8,3 +8,8 @@ updates:
   directory: "/vscode-schematron"
   schedule:
     interval: "weekly"
+  groups:
+    eslint:
+      patterns:
+        - "@eslint/js"
+        - "eslint"
