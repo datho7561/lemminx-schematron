@@ -31,13 +31,15 @@ public class ContentModelManagerManager {
 	private ContentModelManager contentModelManager = null;
 	private List<Consumer<ContentModelManager>> contentModelManagerListeners;
 
+	private static final Object INSTANCE_LOCK = new Object();
 	private static ContentModelManagerManager INSTANCE;
 
-	public static synchronized ContentModelManagerManager getInstance(XMLExtensionsRegistry registry) {
-		if (INSTANCE != null) {
-			return INSTANCE;
+	public static ContentModelManagerManager getInstance(XMLExtensionsRegistry registry) {
+		synchronized (INSTANCE_LOCK) {
+			if (INSTANCE == null) {
+				INSTANCE = new ContentModelManagerManager(registry);
+			}
 		}
-		INSTANCE = new ContentModelManagerManager(registry);
 		return INSTANCE;
 	}
 
