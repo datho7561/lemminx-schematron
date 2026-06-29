@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <junit.version>6.1.0</junit.version>
+    <junit.version>6.1.1</junit.version>
     <lemminx.version>0.31.2</lemminx.version>
     <spotbugs.version>4.10.2</spotbugs.version>
   </properties>
