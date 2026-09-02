@@ -4,6 +4,11 @@ updates:
   directory: "/lemminx-schematron"
   schedule:
     interval: "weekly"
+  allow:
+    - dependency-name: "@types/node"
+      update-types:
+        - "version-update:semver-minor"
+        - "version-update:semver-patch"
 - package-ecosystem: "npm"
   directory: "/vscode-schematron"
   schedule:
