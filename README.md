@@ -70,7 +70,7 @@ _Prerequisites_: git, Java 17 or newer
 
 ### vscode extension
 
-_Prerequisites_: git, Java 17 or newer, NodeJS 20 or newer, __macOS or Linux__ (the `npm` scripts I wrote are not cross platform)
+_Prerequisites_: git, Java 17 or newer, NodeJS 22 or newer, __macOS or Linux__ (the `npm` scripts I wrote are not cross platform)
 
 1. Clone this repo.
 2. `cd` into `vscode-schematron`
